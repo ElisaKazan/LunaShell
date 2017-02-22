@@ -45,9 +45,19 @@ Requirements:
 * Can execute builtin functions
 * Has an initialization file which is executed on creation of a shell process (for customizing prompt, etc)
 * Has a PS1 environment variable to modify the prompt based on a format string
-* 
+* Can redirect the output of a command to a file (and redirect the input of a command from a file)
+* -x initialization option implemented
+* Arguments with spaces can be specified with quotes
 
 ## Timeline
 
-
-
+* [March 02] Get Github setup + plan & division of tasks
+* [March 12] Create REPL 
+* [March 16] Customizable prompt, find/execute command on Path
+* [March 19] Implement “cd”, “exit” and other builtins
+* [March 23] Input/Output redirection
+* [March 26] Add -x initialization option
+* [March 30] Initialization files (~/.lushrc)
+* [April 02] Complete Project and Report
+* [April 05] Project Demo
+* [April 07] Project Report Due
