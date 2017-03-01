@@ -59,8 +59,8 @@ Ask people what they think of the shell in a comparative user study:
 * [March 16] Customizable prompt, find/execute command on Path
 * [March 19] Implement “cd”, “exit” and other builtins
 * [March 23] Input/Output redirection
-* [March 26] Add -x initialization option
-* [March 30] Initialization files (~/.lushrc)
+* [March 26] Initialization files (~/.lushrc) and add -x initialization option
+* [March 30] Conduct and complete user study
 * [April 02] Complete Project and Report
 * [April 05] Project Demo
 * [April 07] Project Report Due
