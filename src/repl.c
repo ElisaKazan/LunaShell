@@ -1,3 +1,5 @@
+#include "unicorn.h"
+
 /*
  * REPL.C
  *
@@ -9,10 +11,10 @@ int read_input(char *buffer, int length, FILE *input) {
     return 0;
 }
 
-int parse_input(char *buffer, int len, struct command* command) {
+int parse_input(char *buffer, int len, command* command) {
     return 0;
 }
 
-int execute(struct command* command) {
+int execute(command* command) {
     return 0;
 }
