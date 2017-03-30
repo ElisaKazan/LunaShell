@@ -15,7 +15,7 @@ int read_input(char *buffer, int length, FILE *input) {
     int index = 0;
     int c = fgetc(input);
 
-    while(c != EOF || c != '\n' || c != ';') {
+    while(c != EOF && c != '\n' && c != ';') {
         buffer[index] = c;
         index++;
 
