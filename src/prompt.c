@@ -9,5 +9,5 @@ int prompt_init() {
 }
 
 int display_prompt() {
-    printf("[%s@%s %s] $ ", username_buffer, hostname_buffer, getwd(NULL));
+    printf("[%s@%s %s] $ ", username_buffer, hostname_buffer, getcwd(NULL, 0));
 }

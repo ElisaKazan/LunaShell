@@ -14,6 +14,12 @@ typedef struct {
     
 } prompt;
 
+// REPL functions
 int read_input(char *buffer, int length, FILE *input);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);
+
+// Prompt functions
+
+int prompt_init();
+int display_prompt();
