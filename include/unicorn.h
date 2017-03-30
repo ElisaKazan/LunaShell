@@ -14,6 +14,6 @@ typedef struct {
     
 } prompt;
 
-int read_input(char *buffer, int length, int input);
+int read_input(char *buffer, int length, FILE *input);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);
