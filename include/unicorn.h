@@ -1,6 +1,8 @@
 // Methods and definitions for the Unicorn Shell (unsh)
 
 #include <stdio.h>
+#include <unistd.h>
+#include <limits.h>
 
 typedef struct {
     char *path; // The (unresolved or resolved) name, will be checked 
@@ -12,6 +14,6 @@ typedef struct {
     
 } prompt;
 
-int read_input(char *buffer, int length, FILE *input);
+int read_input(char *buffer, int length, int input);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);

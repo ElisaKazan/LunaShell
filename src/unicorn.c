@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
     // Loop
     while(status == RUNNING) {
         // Display prompt
+        display_prompt();
         
         // Read line
 
