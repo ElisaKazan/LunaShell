@@ -10,19 +10,27 @@
  * read_input 
  * returns 0 on error, 1 on success.
  */
-int read_input(char *buffer, int length, int input) {
+int read_input(char *buffer, int length, FILE *input) {
     
+    int index = 0;
+    int c = fgetc(input);
 
-    // Check length of file
-    if(1 <= length) {
+    while(c != EOF || c != '\n' || c != ';') {
+        buffer[index] = c;
+        index++;
+
+        if (index >= length) {
+            // ERROR: Command too long
+            return 0;
+        }
+
+        c = fgetc(input);
     }
-    else {
-        // Command is too long
-        // ERROR 
-    }
 
+    // Done reading, add null character
+    buffer[index] = '\0';
 
-    return 0;
+    return 1;
 }
 
 /* 
