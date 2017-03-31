@@ -21,10 +21,17 @@ int read_input(char *buffer, int length, FILE *input) {
 
         if (index >= length) {
             // ERROR: Command too long
+            error = COMMAND_TOO_LONG;
             return 0;
         }
 
         c = fgetc(input);
+    }
+
+    if (c == EOF) {
+        // ERROR: User entered EOF, quit.
+        error = ENCOUNTERED_EOF;
+        return 0;
     }
 
     // Done reading, add null character

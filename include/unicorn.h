@@ -23,3 +23,16 @@ int execute(command* command);
 
 int prompt_init();
 int display_prompt();
+
+enum {
+    PERROR,
+    COMMAND_TOO_LONG,
+    ENCOUNTERED_EOF
+} error;
+
+// Each item in here matches to an error code above in index
+static char* errors[] = {
+    NULL,
+    "command too long",
+    NULL
+};

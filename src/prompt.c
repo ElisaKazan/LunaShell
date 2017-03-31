@@ -1,13 +1,23 @@
 #include "unicorn.h"
 
-char username_buffer[LOGIN_NAME_MAX];
+char *username;
 char hostname_buffer[HOST_NAME_MAX];
 
 int prompt_init() {
-    getlogin_r(username_buffer, LOGIN_NAME_MAX);
-    gethostname(hostname_buffer, HOST_NAME_MAX);
+    // This is better than storing in a buffer because it will be
+    // changed when the euid changes
+    username = getlogin();
+    if (username == NULL) {
+        return 0;
+    }
+
+    if (gethostname(hostname_buffer, HOST_NAME_MAX) == -1) {
+        return 0;
+    }
+
+    return 1;
 }
 
 int display_prompt() {
-    printf("[%s@%s %s] $ ", username_buffer, hostname_buffer, getcwd(NULL, 0));
+    printf("[%s@%s %s] $ ", username, hostname_buffer, getcwd(NULL, 0));
 }
