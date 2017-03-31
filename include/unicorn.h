@@ -15,18 +15,19 @@ typedef struct {
 } prompt;
 
 // REPL functions
-int read_input(char *buffer, int length, FILE *input);
+int read_input(FILE *file, char **output);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);
 
 // Prompt functions
 
 int prompt_init();
-int display_prompt();
+char* get_prompt();
 
 enum {
     PERROR,
     COMMAND_TOO_LONG,
+    EMPTY_LINE,
     ENCOUNTERED_EOF
 } error;
 
@@ -34,5 +35,6 @@ enum {
 static char* errors[] = {
     NULL,
     "command too long",
+    NULL,
     NULL
 };

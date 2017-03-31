@@ -7,15 +7,11 @@
 
 #include <stdlib.h>
 
-// 2^16 will be our maximum command length.
-#define COMMAND_LENGTH 65536
-
-char command_buffer[COMMAND_LENGTH];
-
 enum {
     RUNNING = 1,
     EXIT = 0
 } status;
+
 
 void error_ret(int ret, int quit_on_error) {
     if (ret == 0) {
@@ -34,7 +30,6 @@ void error_ret(int ret, int quit_on_error) {
     }
 }
 
-
 int main(int argc, char **argv) {
     status = RUNNING;
 
@@ -43,12 +38,10 @@ int main(int argc, char **argv) {
 
     // Loop
     while(status == RUNNING) {
-        // Display prompt
-        ret = display_prompt();
-        error_ret(ret, 0);
-
-        // Read line
-        ret = read_input(command_buffer, COMMAND_LENGTH, stdin);
+        char *line;
+        
+        // Read line (function will dynamically allocate line)
+        ret = read_input(stdin, &line);
         error_ret(ret, 0);
 
         // Evaluate & Print
