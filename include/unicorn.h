@@ -5,9 +5,10 @@
 #include <limits.h>
 
 typedef struct {
-    char *path; // The (unresolved or resolved) name, will be checked 
-                // against the PATH environmental variable
     char **arguments; // The arguments to be given to the command
+
+    char *output;
+    char *input;
 } command;
 
 typedef struct {
