@@ -19,7 +19,9 @@ static char* errors[] = {
     NULL,
     "command too long",
     NULL,
-    NULL
+    NULL,
+    "duplicate inputs",
+    "duplicate outputs"
 };
 
 void error_ret(int ret, int quit_on_error) {
@@ -64,8 +66,8 @@ int main(int argc, char **argv) {
         error_ret(ret, 0);
 
         // Evaluate/Execute
-        ret = execute(&command);
-        error_ret(ret, 0);
+        //ret = execute(&command);
+        //error_ret(ret, 0);
 
         // Check status
 

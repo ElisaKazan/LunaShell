@@ -86,6 +86,9 @@ int parse_input(char *buffer, int length, command* command) {
     int quote = 0;      // Quote state (0 = not quote, 1 = quotes)
     int isArg = 1;      // Arument state ( 0 = not arg, 1 = is arg)
     int i = 0;          // Loop counter
+    
+    int type;
+    int len;
 
     char *currToken = buffer;
 
@@ -94,12 +97,12 @@ int parse_input(char *buffer, int length, command* command) {
         if (buffer[i] == '"') {
             // Handling quotes
             quote = !quote;
-            buffer[i] == '\0';
+            buffer[i] = '\0';
             numArgs += isArg;
         }
         else if (buffer[i] == ' ' && quote == 0) {
             // Handling spaces outside of quotes
-            buffer[i] == '\0';
+            buffer[i] = '\0';
             numArgs += isArg; 
         }
         else if (buffer[i] == '<' || buffer[i] == '>') {
@@ -118,7 +121,68 @@ int parse_input(char *buffer, int length, command* command) {
     command->arguments = malloc(sizeof(char*) * (numArgs + 1));
 
     // Assign tokens to command variables
-    return 0;
+    i = 0;
+    type = 0; // argument = 0, input = 1, output = 2
+    len = 0;
+    numArgs = 0;
+
+    while (i < length) {
+
+        len = strlen(currToken);
+
+        if (strcmp(currToken, "<") == 0) {
+            // Input
+            if (command->input == NULL) {
+                type = 1;
+            }
+            else {
+                // ERROR: Duplicate input
+                error = DUPLICATE_INPUT;
+                return 0;
+            }
+        }
+        else if (strcmp(currToken, ">") == 0) {
+            // Output
+            if (command->output == NULL) {
+                type = 2;
+            }
+            else {
+                // ERROR: Duplicate output
+                error = DUPLICATE_OUTPUT;
+                return 0;
+            }
+        }
+        else if (type == 1) {
+            // This token is an input 
+            command->input = currToken;
+        }
+        else if (type == 2) {
+            // This token is an output
+            command->output = currToken;
+        }
+        else {
+            // This token is an argument
+            command->arguments[numArgs] = currToken;
+            numArgs++;
+        }
+
+        // Increment token TODO shit might be broke here
+        currToken += len;
+        i += len;
+
+        while (*currToken == '\0') {
+            currToken++;
+            i++;
+        }
+    }
+
+    // TESTING
+    for (i = 0; i < numArgs; i++) {
+        printf("Argument %d: %s\n", i, command->arguments[i]);
+    }
+    printf("Output: %s\n", command->output);
+    printf("Input: %s\n", command->input);
+    return 1;
 }
 
 /*
