@@ -2,6 +2,7 @@
 
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <stdlib.h>
 
 /*
  * REPL.C
@@ -73,24 +74,49 @@ int read_input(FILE *input, char **output) {
 
 /* 
  * parse_input
- * 
+ * Loops over each character, adding \0 where the spaces are
+ * to turn the char array into an array of char arrays (i.e. args)
+ * Returns num arguments
  */
 int parse_input(char *buffer, int length, command* command) {   
-    char *ptr = strtok(buffer, " ");
+    int numArgs = 0;    // Argument counter
+    int quote = 0;      // Quote state (0 = not quote, 1 = quotes)
+    int isArg = 1;      // Arument state ( 0 = not arg, 1 = is arg)
+    int i = 0;          // Loop counter
 
-    // Get command
-    if(ptr != NULL) {
-        command.path 
-        command.path = ptr;
-    }
-    else {
-        // ERROR: Insufficient arguments
+    char *currToken = buffer;
+
+    // Loops over chars in buffer and adds '\0'
+    for(i = 0; i < length; i++) {
+        if (buffer[i] == '"') {
+            // Handling quotes
+            quote = !quote;
+            buffer[i] == '\0';
+            numArgs += isArg;
+        }
+        else if (buffer[i] == ' ' && quote == 0) {
+            // Handling spaces outside of quotes
+            buffer[i] == '\0';
+            numArgs += isArg; 
+        }
+        else if (buffer[i] == '<' || buffer[i] == '>') {
+            // No more arguments
+            isArg = 0;
+        }
+        // Otherwise, just continue
     }
 
-    // Get arguments
-    while (ptr != NULL) {
-
+    // Check for invalid quotes
+    if (quote == 1) {
+        // ERROR: Invalid quotes
     }
+
+    // Allocate space for args
+    command->arguments = malloc(sizeof(char*) * (numArgs + 1));
+
+    // Assign tokens to command variables
+
+
 
     return 0;
 }
