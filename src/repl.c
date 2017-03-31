@@ -75,7 +75,23 @@ int read_input(FILE *input, char **output) {
  * parse_input
  * 
  */
-int parse_input(char *buffer, int len, command* command) {
+int parse_input(char *buffer, int length, command* command) {   
+    char *ptr = strtok(buffer, " ");
+
+    // Get command
+    if(ptr != NULL) {
+        command.path 
+        command.path = ptr;
+    }
+    else {
+        // ERROR: Insufficient arguments
+    }
+
+    // Get arguments
+    while (ptr != NULL) {
+
+    }
+
     return 0;
 }
 
