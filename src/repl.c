@@ -4,6 +4,9 @@
 #include <readline/history.h>
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 /*
  * REPL.C
  *
@@ -115,9 +118,6 @@ int parse_input(char *buffer, int length, command* command) {
     command->arguments = malloc(sizeof(char*) * (numArgs + 1));
 
     // Assign tokens to command variables
-
-
-
     return 0;
 }
 
@@ -126,5 +126,59 @@ int parse_input(char *buffer, int length, command* command) {
  * 
  */
 int execute(command* command) {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        // We're the child
+        FILE *output_file = (command->output == NULL) ? stdout : fopen(command->output, "w");
+        FILE *input_file = (command->input == NULL) ? stdin : fopen(command->input, "r");
+
+        if (!output_file || !input_file) {
+            perror("unsh");
+
+            // Make sure we clean up, print the perror, then exit
+            fclose(output_file);
+            fclose(input_file);
+
+            exit(1);
+        }
+        
+        char *file = command->arguments[0];
+        int ret = 0;
+        ret = dup2(fileno(output_file), STDOUT_FILENO);
+
+        if (ret == -1) {
+            perror("unsh");
+
+            fclose(output_file);
+            fclose(input_file);
+
+            exit(1);
+        }
+
+        execvp(file, command->arguments);
+        
+        exit(0);
+    }
+    else if (pid == -1) {
+        // We're the parent, but an error occurred and no child was created
+        // Ask for the perror to be printed
+        error = PERROR;
+        return 0;
+    }
+    else {
+        // We're the parent, and the child was created and lives at pid `pid`
+        int status;
+        do {
+            waitpid(pid, &status, 0);
+        } while (WIFEXITED(status));
+
+        int exit_status = WEXITSTATUS(status);
+
+        printf("Process %d exited with status code %d\n", pid, exit_status);
+        
+        return 1;
+    }
+    
     return 0;
 }

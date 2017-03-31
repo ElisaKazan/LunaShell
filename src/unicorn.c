@@ -6,12 +6,21 @@
 #include "unicorn.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 enum {
     RUNNING = 1,
     EXIT = 0
 } status;
 
+// Each item in here matches to an error code in the error enum
+static char* errors[] = {
+    "unspecified error",
+    NULL,
+    "command too long",
+    NULL,
+    NULL
+};
 
 void error_ret(int ret, int quit_on_error) {
     if (ret == 0) {
@@ -33,23 +42,35 @@ void error_ret(int ret, int quit_on_error) {
 int main(int argc, char **argv) {
     status = RUNNING;
 
+    char *line;
+    int line_len;
+
     int ret = prompt_init();
     error_ret(ret, 1);
 
     // Loop
     while(status == RUNNING) {
-        char *line;
-        
         // Read line (function will dynamically allocate line)
         ret = read_input(stdin, &line);
         error_ret(ret, 0);
 
-        // Evaluate & Print
+        line_len = strlen(line) + 1;
+
+        // Parse
+        command command;
+        memset(&command, 0, sizeof(command));
+
+        ret = parse_input(line, line_len, &command);
+        error_ret(ret, 0);
+
+        // Evaluate/Execute
+        ret = execute(&command);
+        error_ret(ret, 0);
 
         // Check status
 
         // Cleanup
-        
+        free(line);
     }
     return 0;
 }

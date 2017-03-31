@@ -1,8 +1,11 @@
 // Methods and definitions for the Unicorn Shell (unsh)
 
+#define _DEFAULT_SOURCE
+
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
+#include <errno.h>
 
 typedef struct {
     char **arguments; // The arguments to be given to the command
@@ -26,16 +29,9 @@ int prompt_init();
 char* get_prompt();
 
 enum {
+    UNSPECIFIED,
     PERROR,
     COMMAND_TOO_LONG,
     EMPTY_LINE,
     ENCOUNTERED_EOF
 } error;
-
-// Each item in here matches to an error code above in index
-static char* errors[] = {
-    NULL,
-    "command too long",
-    NULL,
-    NULL
-};
