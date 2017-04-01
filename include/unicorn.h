@@ -19,6 +19,7 @@ typedef struct {
 } prompt;
 
 // REPL functions
+
 int read_input(FILE *file, char **output);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);
@@ -27,6 +28,9 @@ int execute(command* command);
 
 int prompt_init();
 char* get_prompt();
+
+// Signal handling functions
+void register_signals();
 
 enum {
     UNSPECIFIED,

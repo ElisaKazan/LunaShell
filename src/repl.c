@@ -176,12 +176,6 @@ int parse_input(char *buffer, int length, command* command) {
         }
     }
 
-    // TESTING
-    for (i = 0; i < numArgs; i++) {
-        printf("Argument %d: %s\n", i, command->arguments[i]);
-    }
-    printf("Output: %s\n", command->output);
-    printf("Input: %s\n", command->input);
     return 1;
 }
 
@@ -219,9 +213,7 @@ int execute(command* command) {
 
             exit(1);
         }
-
         execvp(file, command->arguments);
-        
         exit(0);
     }
     else if (pid == -1) {
@@ -233,10 +225,16 @@ int execute(command* command) {
     else {
         // We're the parent, and the child was created and lives at pid `pid`
         int status;
+        int ret;
         do {
-            waitpid(pid, &status, 0);
-        } while (WIFEXITED(status));
+            ret = waitpid(pid, &status, 0);
+        } while (WIFEXITED(status) && ret != -1);
 
+        if (ret == -1) {
+            error = PERROR;
+            return 0;
+        }
+        
         int exit_status = WEXITSTATUS(status);
 
         printf("Process %d exited with status code %d\n", pid, exit_status);
