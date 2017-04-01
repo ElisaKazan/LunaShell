@@ -21,7 +21,9 @@ static char* errors[] = {
     NULL,
     NULL,
     "duplicate inputs",
-    "duplicate outputs"
+    "duplicate outputs",
+    NULL,
+    "unmatched quote(s)"
 };
 
 void error_ret(int ret, int quit_on_error) {

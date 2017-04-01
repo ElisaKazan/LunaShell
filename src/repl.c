@@ -66,8 +66,8 @@ int read_input(FILE *input, char **output) {
         *output = command_buffer;
     }
 
-    // The first character is \0 (aka line is blank)
     if (!**output) {
+        // ERROR: The first char is \0 (aka line is blank)
         error = EMPTY_LINE;
         return 0;
     }
@@ -115,6 +115,8 @@ int parse_input(char *buffer, int length, command* command) {
     // Check for invalid quotes
     if (quote == 1) {
         // ERROR: Invalid quotes
+        error = INVALID_QUOTES;
+        return 0;
     }
 
     // Allocate space for args
