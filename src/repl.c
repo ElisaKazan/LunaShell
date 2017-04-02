@@ -409,7 +409,7 @@ void free_stack_command(command *command) {
 
 int cd_handler(command *command) {
     char *dir = expandpath(command->arguments[1]);
-    printf("%s", dir);
+    printf("%s\n", dir);
 
     int ret = chdir(dir);
 
