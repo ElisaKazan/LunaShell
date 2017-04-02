@@ -1,9 +1,11 @@
 #include "unicorn.h"
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 char *username;
 char hostname_buffer[HOST_NAME_MAX];
+char *ps1;
 
 #define PROMPT_MAX 256
 
@@ -32,6 +34,14 @@ int prompt_init() {
         return 0;
     }
 
+    // Get or Set PS1 
+    ps1 = getenv("PS1");
+
+    if (!ps1) {
+        ps1 = "[\\u@\\h \\w]\\U$ ";
+        setenv("PS1", ps1, 1);
+    }
+
     return 1;
 }
 
@@ -40,9 +50,9 @@ int prompt_init() {
  * <description> TODO
  */
 char *get_prompt() {
-    int length = strlen("[\\u@\\h \\w]\\U $");
+    int length = strlen(ps1);
     char user_data[length + 1];
-    strcpy(user_data, "[\\u@\\h \\w]\\U $");
+    strcpy(user_data, ps1);
 
     char working_buffer[PROMPT_MAX];
 
