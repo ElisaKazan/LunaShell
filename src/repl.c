@@ -71,7 +71,7 @@ builtin builtins[] = {
         .name = "rainbowize",
         .min_args = 1,
         .max_args = 1,
-        .handler = unicorn_handler
+        .handler = rainbowize_handler
     }
 };
 
@@ -486,8 +486,8 @@ int unicorn_handler(command *command) {
 }
 
 int rainbowize_handler(command *command) {
-    fprintf(stderr, "Need to implement this :(\n");
-//    rainbowize = !rainbowize;
+//    fprintf(stderr, "Need to implement this :(\n");
+    rainbowize = !rainbowize;
 
     return 1;
 }
