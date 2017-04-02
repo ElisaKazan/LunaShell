@@ -24,6 +24,7 @@ typedef struct {
 
 int cd_handler(command *command);
 int exit_handler(command *command);
+int getenv_handler(command *command);
 
 builtin builtins[] = {
     {
@@ -37,6 +38,12 @@ builtin builtins[] = {
         .min_args = 1,
         .max_args = 2,
         .handler = exit_handler
+    },
+    {
+        .name = "getenv",
+        .min_args = 2,
+        .max_args = 2,
+        .handler = getenv_handler
     }
 };
 
@@ -258,7 +265,6 @@ int execute_builtin(builtin *builtin, command *command) {
     return builtin->handler(command);
 }
 
-
 /*
  * execute
  * 
@@ -389,4 +395,19 @@ int exit_handler(command *command) {
     }
 
     exit(status);
+}
+
+int getenv_handler(command *command) {
+    char *target = command->arguments[1];
+
+    char *val = getenv(target);
+
+    if (!val) {
+        fprintf(stderr, "No value for environmental variable %s\n", target);
+    }
+    else {
+        printf("%s=%s\n", target, val);
+    }
+
+    return 1;
 }
