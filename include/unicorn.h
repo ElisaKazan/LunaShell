@@ -35,6 +35,8 @@ extern pid_t current_foreground_child;
 int prompt_init();
 char* get_prompt();
 
+extern int rainbowize;
+
 // Signal handling functions
 int register_signals();
 

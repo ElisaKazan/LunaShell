@@ -25,6 +25,10 @@ typedef struct {
 int cd_handler(command *command);
 int exit_handler(command *command);
 int getenv_handler(command *command);
+int setenv_handler(command *command);
+int unset_handler(command *command);
+int unicorn_handler(command *command);
+int rainbowize_handler(command *command);
 
 builtin builtins[] = {
     {
@@ -44,6 +48,30 @@ builtin builtins[] = {
         .min_args = 2,
         .max_args = 2,
         .handler = getenv_handler
+    },
+    {
+        .name = "setenv",
+        .min_args = 3,
+        .max_args = 3,
+        .handler = setenv_handler
+    },
+    {
+        .name = "unset",
+        .min_args = 2,
+        .max_args = 2,
+        .handler = unset_handler
+    },
+    {
+        .name = "unicorn",
+        .min_args = 1,
+        .max_args = 1,
+        .handler = unicorn_handler
+    },
+    {
+        .name = "rainbowize",
+        .min_args = 1,
+        .max_args = 1,
+        .handler = unicorn_handler
     }
 };
 
@@ -306,6 +334,18 @@ int execute(command *command) {
 
             exit(1);
         }
+
+        ret = dup2(fileno(input_file), STDIN_FILENO);
+
+        if (ret == -1) {
+            perror("unsh");
+
+            fclose(output_file);
+            fclose(input_file);
+
+            exit(1);
+        }
+        
         ret = execvp(file, command->arguments);
 
         if (ret == -1) {
@@ -412,6 +452,42 @@ int getenv_handler(command *command) {
     else {
         printf("%s=%s\n", target, val);
     }
+
+    return 1;
+}
+
+int setenv_handler(command *command) {
+    char *key = command->arguments[1];
+    char *value = command->arguments[2];
+
+    if (setenv(key, value, 1) == -1) {
+        error = PERROR;
+        return 0;
+    }
+
+    return 1;
+}
+
+int unset_handler(command *command) {
+    char *key = command->arguments[1];
+
+    if (unsetenv(key) == -1) {
+        error = PERROR;
+        return 0;
+    }
+
+    return 1;
+}
+
+int unicorn_handler(command *command) {
+    fprintf(stderr, "Need to implement this :(\n");
+
+    return 1;
+}
+
+int rainbowize_handler(command *command) {
+    fprintf(stderr, "Need to implement this :(\n");
+//    rainbowize = !rainbowize;
 
     return 1;
 }
