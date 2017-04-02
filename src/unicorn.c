@@ -24,7 +24,10 @@ static char* errors[] = {
     "duplicate outputs",
     NULL,
     "unmatched quote(s)",
-    "invalid escape character"
+    "invalid escape character",
+    "too few arguments to builtin command",
+    "too many arguments to builtin command",
+    "invalid argument to builtin command"
 };
 
 void error_ret(int ret, int quit_on_error) {

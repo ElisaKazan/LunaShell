@@ -18,10 +18,6 @@ typedef struct {
     char *input;
 } command;
 
-typedef struct {
-    
-} prompt;
-
 // REPL functions
 int init_repl();
 int read_input(FILE *file, char **output);
@@ -49,5 +45,8 @@ enum {
     DUPLICATE_OUTPUT,
     FILE_NOT_FOUND,
     INVALID_QUOTES,
-    INVALID_ESC
+    INVALID_ESC,
+    TOO_FEW_ARGS,
+    TOO_MANY_ARGS,
+    INVALID_ARGUMENT
 } error;

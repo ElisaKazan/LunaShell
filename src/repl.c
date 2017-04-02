@@ -10,6 +10,38 @@
 
 pid_t current_foreground_child = -1;
 
+typedef struct {
+    // Unqualified name (e.g. cd)
+    const char *name;
+
+    // Minimum and maximum including the command itself (e.g. 2 for cd). -1 if there is no min/max
+    int min_args;
+    int max_args;
+
+    // handler function that takes a command and returns 1 or 0 depending on if it set error.
+    int (*handler) (command*);
+} builtin;
+
+int cd_handler(command *command);
+int exit_handler(command *command);
+
+builtin builtins[] = {
+    {
+        .name = "cd",
+        .min_args = 2,
+        .max_args = 2,
+        .handler = cd_handler
+    },
+    {
+        .name = "exit",
+        .min_args = 1,
+        .max_args = 2,
+        .handler = exit_handler
+    }
+};
+
+const int NUM_BUILTINS = sizeof builtins / sizeof builtins[0];
+
 /*
  * REPL.C
  *
@@ -203,11 +235,42 @@ int parse_input(char *buffer, int length, command* command) {
     return 1;
 }
 
+builtin *search_builtins(command *command) {
+    for (int i = 0; i < NUM_BUILTINS; i++) {
+        if (strcmp(command->arguments[0], builtins[i].name) == 0) {
+            return builtins + i;
+        }
+    }
+
+    return NULL;
+}
+
+int execute_builtin(builtin *builtin, command *command) {
+    if (builtin->min_args != -1 && command->num_args < builtin->min_args) {
+        error = TOO_FEW_ARGS;
+        return 0;
+    }
+    if (builtin->max_args != -1 && command->num_args > builtin->max_args) {
+        error = TOO_MANY_ARGS;
+        return 0;
+    }
+
+    return builtin->handler(command);
+}
+
+
 /*
  * execute
  * 
  */
-int execute(command* command) {
+int execute(command *command) {
+    builtin *builtin = search_builtins(command);
+
+    // Check for and execute builtins
+    if (builtin) {
+        return execute_builtin(builtin, command);
+    }
+
     pid_t pid = fork();
 
     if (pid == 0) {
@@ -274,7 +337,14 @@ int execute(command* command) {
             return 0;
         }
 
+        // WEXITSTATUS only returns the lower 8 bytes, meaning it can be at most 255
+        // so it fits in a 4-char buffer, hence the magic number :)
         int exit_status = WEXITSTATUS(status);
+
+        char exit_buffer[4];
+        sprintf(exit_buffer, "%d", exit_status);
+
+        setenv("?", exit_buffer, 1);
 
         //printf("Process %d exited with status code %d\n", pid, exit_status);
 
@@ -289,4 +359,34 @@ int execute(command* command) {
 
 void free_stack_command(command *command) {
     free(command->arguments);
+}
+
+int cd_handler(command *command) {
+    char *dir = command->arguments[1];
+
+    int ret = chdir(dir);
+
+    if (ret == -1) {
+        error = PERROR;
+        return 0;
+    }
+
+    return 1;
+}
+
+int exit_handler(command *command) {
+    int status = 0;
+    char *watchptr;
+
+    if (command->num_args == 2) {
+        status = strtol(command->arguments[1], &watchptr, 10);
+
+        // If the watchptr is not 0 (aka the whole string wasn't converted to a number)
+        if (*watchptr) {
+            error = INVALID_ARGUMENT;
+            return 0;
+        }
+    }
+
+    exit(status);
 }
