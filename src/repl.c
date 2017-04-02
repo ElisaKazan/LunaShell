@@ -22,6 +22,15 @@ typedef struct {
     int (*handler) (command*);
 } builtin;
 
+typedef struct alias {
+    command *contents;
+    struct alias *prev;
+    struct alias *next;
+} alias;
+
+alias *head = NULL;
+alias *tail = NULL;
+
 int cd_handler(command *command);
 int exit_handler(command *command);
 int getenv_handler(command *command);
@@ -325,6 +334,7 @@ int execute(command *command) {
         char *file = command->arguments[0];
         int ret = 0;
         ret = dup2(fileno(output_file), STDOUT_FILENO);
+        ret = dup2(fileno(input_file), STDIN_FILENO);
 
         if (ret == -1) {
             perror("unsh");
