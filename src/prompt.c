@@ -6,13 +6,17 @@
 char *username;
 char hostname_buffer[HOST_NAME_MAX];
 char *ps1;
+int rainbowize = 1; // Rainbow boolean (1 = rainbow, 0 = not rainbow)
+int c = 1;
 
-#define PROMPT_MAX 256
+#define PROMPT_MAX 256*5 // for rainbow
 
 char prompt_buffer[PROMPT_MAX];
 
 // Function Prototypes
 int adjust_prompt(char *buffer, char *string, int p);
+int insert_char(char *buffer, char character, int p);
+int insert_string(char *buffer, char *string, int p);
 char *get_date(char *date_buf, int length);
 char *get_time(char *time_buf, int length);
 char *get_directory(char *dir_buf, int length);
@@ -38,6 +42,7 @@ int prompt_init() {
     ps1 = getenv("PS1");
 
     if (!ps1) {
+        //ps1 = "ABCDEFG- \\u HIJKLMNOP";
         ps1 = "[\\u@\\h \\w]\\U$ ";
         setenv("PS1", ps1, 1);
     }
@@ -61,42 +66,50 @@ char *get_prompt() {
 
     int is_special = 0; // Special boolean (0 = not special, 1 = special) 
 
-    for (i = 0; i < length && p < PROMPT_MAX - 1; i++) {
+    for (i = 0; i < length && p < PROMPT_MAX - 9; i++) {
         if (is_special == 1) {
             // TODO switch
             switch(user_data[i]) {
                 case 'd':
                     // Date
-                    p = adjust_prompt(prompt_buffer, get_date(working_buffer, PROMPT_MAX), p);
+                    p = insert_string(prompt_buffer, get_date(working_buffer, PROMPT_MAX), p);
+                    //p = adjust_prompt(prompt_buffer, get_date(working_buffer, PROMPT_MAX), p);
                     break;
                 case 'h':
                     // Hostname
-                    p = adjust_prompt(prompt_buffer, hostname_buffer, p);
+                    p = insert_string(prompt_buffer, hostname_buffer, p);
+                    //p = adjust_prompt(prompt_buffer, hostname_buffer, p);
                     break;
                 case 's':
                     // Shell 
-                    p = adjust_prompt(prompt_buffer, SHELL_NAME, p);
+                    p = insert_string(prompt_buffer, SHELL_NAME, p);
+                    //p = adjust_prompt(prompt_buffer, SHELL_NAME, p);
                     break;
                 case 'u':
                     // Username
-                    p = adjust_prompt(prompt_buffer, username, p);
+                    p = insert_string(prompt_buffer, username, p);
+                    //p = adjust_prompt(prompt_buffer, username, p);
                     break;
                 case 'U':
                     // Unicorn Emoji
-                    p = adjust_prompt(prompt_buffer, UNICORN, p);
+                    p = insert_string(prompt_buffer, UNICORN, p);
+                    //p = adjust_prompt(prompt_buffer, UNICORN, p);
                     break;
                 case 't':
                     // Time
-                    p = adjust_prompt(prompt_buffer, get_time(working_buffer, PROMPT_MAX), p); 
+                    p = insert_string(prompt_buffer, get_time(working_buffer, PROMPT_MAX), p);
+                    //p = adjust_prompt(prompt_buffer, get_time(working_buffer, PROMPT_MAX), p); 
                     break;
                 case 'w':
                     // Current Working Directory
-                    p = adjust_prompt(prompt_buffer, get_directory(working_buffer, PROMPT_MAX), p);
+                    p = insert_string(prompt_buffer, get_directory(working_buffer, PROMPT_MAX), p);
+                    //p = adjust_prompt(prompt_buffer, get_directory(working_buffer, PROMPT_MAX), p);
                     break;
                 case '\\':
                     // Backslash
-                    prompt_buffer[p] = '\\';
-                    p += 1;
+                    p = insert_char(prompt_buffer, '\\', p);
+                    //prompt_buffer[p] = '\\';
+                    //p += 1;
                     break;
                 default:
                     // Invalid escape character
@@ -112,15 +125,15 @@ char *get_prompt() {
         }
         else {
             // Regular character
-            prompt_buffer[p] = user_data[i];
-            p += 1;
+            p = insert_char(prompt_buffer, user_data[i], p);
+            //prompt_buffer[p] = user_data[i];
+            //p += 1;
         }
     }
 
     prompt_buffer[p] = '\0';
+    strcat(prompt_buffer, "\001\e[0m\002");
 
-    
-    //snprintf(prompt_buffer, PROMPT_MAX, "[%s@%s %s]🦄 $ ", username, hostname_buffer, getcwd(NULL, 0));
     return prompt_buffer;
 }
 
@@ -134,6 +147,46 @@ int adjust_prompt(char *buffer, char *string, int p) {
     int n = PROMPT_MAX - 1 - p;
     strncpy(buffer + p, string, n);
     p += min(n, strlen(string));
+
+    return p;
+}
+
+int insert_char(char *buffer, char character, int p) {
+    if (rainbowize) {
+        int len = 7;
+        int n = PROMPT_MAX - 1 - p;
+        
+        if (len + 1 > n) {
+            return p;
+        }
+
+        snprintf(buffer + p, n, "\001\e[3%dm\002", c);
+        c = (c + 1) % 7;
+        p += min(n, len);
+    }
+    
+    buffer[p] = character;
+    buffer[p + 1] = '\0';
+    p += 1;
+
+    return p;
+}
+
+int insert_string(char *buffer, char *string, int p) {
+    int n = PROMPT_MAX - 1 - p;
+    int len = strlen(string);
+    int i;
+
+    if (rainbowize) {
+        for (i = 0; i < len; i++) {
+            char curr = string[i];
+            p = insert_char(buffer, curr, p);
+        }
+    }
+    else {
+        strncpy(buffer + p, string, n);
+        p += min(n, strlen(string));
+    }
 
     return p;
 }
