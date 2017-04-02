@@ -141,9 +141,9 @@ int main(int argc, char **argv) {
     if (unshrc) {
         // Don't die on EOFs, they're normal in files :D
         repl(unshrc, 0);
+	fclose(unshrc);
     }
 
-    fclose(unshrc);
     free(unshrcpath);
 
     // Die on EOF
