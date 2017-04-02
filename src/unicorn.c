@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pwd.h>
+
 enum {
     RUNNING = 1,
     EXIT = 0
@@ -40,33 +42,33 @@ void error_ret(int ret, int quit_on_error) {
             fprintf(stderr, "unsh: %s\n", errors[error]);
         }
 
-        if (error == INVALID_ESC || error == ENCOUNTERED_EOF || quit_on_error) {
+        if (error == INVALID_ESC || quit_on_error) {
             printf("\n");
             exit(1);
         }
     }
 }
 
-int main(int argc, char **argv) {
-    status = RUNNING;
-
+void repl(FILE *input, int fataleof) {
+    int ret;
     char *line;
     int line_len;
-
-    int ret = prompt_init();
-    error_ret(ret, 1);
-
-    ret = register_signals();
-    error_ret(ret, 1);
-
-    ret = init_repl();
-    error_ret(ret, 1);
-
+    
     // Loop
     while(status == RUNNING) {
         // Read line (function will dynamically allocate line)
-        ret = read_input(stdin, &line);
+        ret = read_input(input, &line);
         error_ret(ret, 0);
+
+        if (!ret && error == ENCOUNTERED_EOF) {
+            if (fataleof) {
+                printf("\n");
+                exit(0);
+            }
+            else {
+                return;
+            }
+        }
 
         if (!ret) {
             continue;
@@ -96,10 +98,57 @@ int main(int argc, char **argv) {
         // Check status
 
         // Cleanup
-        free(line);
+        if (input == stdin) {
+            free(line);
+        }
 
         free_stack_command(&command);
     }
+}
+
+char *expandpath(const char *path) {
+    if (path[0] == '~' && (path[1] == '/' || path[1] == '\0')) {
+        int pathlen = strlen(path);
+        const char *homedir = getpwuid(getuid())->pw_dir;
+        int homelen = strlen(homedir);
+
+        char *new_path = malloc(pathlen + homelen + 3);
+
+        strcpy(new_path, homedir);
+        strcpy(new_path + homelen, path + 1);
+        return new_path;
+    }
+
+    return realpath(path, NULL);
+}
+
+int main(int argc, char **argv) {
+    status = RUNNING;
+
+    int ret = prompt_init();
+    error_ret(ret, 1);
+
+    ret = register_signals();
+    error_ret(ret, 1);
+
+    ret = init_repl();
+    error_ret(ret, 1);
+
+    char *unshrcpath = expandpath("~/.unshrc");
+    //printf("Looking for unshrc at %s", unshrcpath);
+    FILE *unshrc = fopen(unshrcpath, "r");
+
+    if (unshrc) {
+        // Don't die on EOFs, they're normal in files :D
+        repl(unshrc, 0);
+    }
+
+    fclose(unshrc);
+    free(unshrcpath);
+
+    // Die on EOF
+    repl(stdin, 1);
+
     return 0;
 }
 

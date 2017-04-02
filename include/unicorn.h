@@ -18,6 +18,9 @@ typedef struct {
     char *input;
 } command;
 
+// Main file funcs
+char *expandpath(const char *path); // Returns a malloc'd buffer
+
 // REPL functions
 int init_repl();
 int read_input(FILE *file, char **output);

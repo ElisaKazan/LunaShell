@@ -355,7 +355,7 @@ int execute(command *command) {
         //printf("Process %d exited with status code %d\n", pid, exit_status);
 
         current_foreground_child = -1;
-        
+
         return 1;
     }
     
@@ -368,9 +368,13 @@ void free_stack_command(command *command) {
 }
 
 int cd_handler(command *command) {
-    char *dir = command->arguments[1];
+    char *dir = expandpath(command->arguments[1]);
+    printf("%s", dir);
 
     int ret = chdir(dir);
+
+    // expandpath dynamically allocates this
+    free(dir);
 
     if (ret == -1) {
         error = PERROR;
