@@ -73,43 +73,34 @@ char *get_prompt() {
                 case 'd':
                     // Date
                     p = insert_string(prompt_buffer, get_date(working_buffer, PROMPT_MAX), p);
-                    //p = adjust_prompt(prompt_buffer, get_date(working_buffer, PROMPT_MAX), p);
                     break;
                 case 'h':
                     // Hostname
                     p = insert_string(prompt_buffer, hostname_buffer, p);
-                    //p = adjust_prompt(prompt_buffer, hostname_buffer, p);
                     break;
                 case 's':
                     // Shell 
                     p = insert_string(prompt_buffer, SHELL_NAME, p);
-                    //p = adjust_prompt(prompt_buffer, SHELL_NAME, p);
                     break;
                 case 'u':
                     // Username
                     p = insert_string(prompt_buffer, username, p);
-                    //p = adjust_prompt(prompt_buffer, username, p);
                     break;
                 case 'U':
                     // Unicorn Emoji
                     p = insert_string(prompt_buffer, UNICORN, p);
-                    //p = adjust_prompt(prompt_buffer, UNICORN, p);
                     break;
                 case 't':
                     // Time
                     p = insert_string(prompt_buffer, get_time(working_buffer, PROMPT_MAX), p);
-                    //p = adjust_prompt(prompt_buffer, get_time(working_buffer, PROMPT_MAX), p); 
                     break;
                 case 'w':
                     // Current Working Directory
                     p = insert_string(prompt_buffer, get_directory(working_buffer, PROMPT_MAX), p);
-                    //p = adjust_prompt(prompt_buffer, get_directory(working_buffer, PROMPT_MAX), p);
                     break;
                 case '\\':
                     // Backslash
                     p = insert_char(prompt_buffer, '\\', p);
-                    //prompt_buffer[p] = '\\';
-                    //p += 1;
                     break;
                 default:
                     // Invalid escape character

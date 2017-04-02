@@ -496,7 +496,6 @@ int unicorn_handler(command *command) {
 }
 
 int rainbowize_handler(command *command) {
-//    fprintf(stderr, "Need to implement this :(\n");
     rainbowize = !rainbowize;
 
     return 1;
