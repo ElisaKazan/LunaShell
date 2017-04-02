@@ -35,7 +35,13 @@ int read_input(FILE *input, char **output) {
     int index = 0;
     if (input == stdin) {
         // reset errno in case readline sets (we check if it's 0 below)
-        char *line = readline(get_prompt());
+        char *prompt = get_prompt();
+
+        if (!prompt) {
+            return 0;
+        }
+
+        char *line = readline(prompt);
 
         // We encountered an EOF
         if (!line) {

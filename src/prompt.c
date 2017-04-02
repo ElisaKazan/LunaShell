@@ -101,7 +101,7 @@ char *get_prompt() {
                 default:
                     // Invalid escape character
                     error = INVALID_ESC;
-                    return 0;
+                    return NULL;
             }
 
             is_special = 0;
@@ -161,7 +161,8 @@ char *get_time(char *time_buf, int length) {
 }
 
 char *get_directory(char *dir_buf, int length) {
-    dir_buf = getcwd(NULL, 0);
+    getcwd(dir_buf, length);
+
     return dir_buf;
 }
 
