@@ -1,6 +1,6 @@
 DEPS := libreadline6 libreadline6-dev
 
-unsh: bin/repl.o bin/prompt.o bin/unicorn.o
+unsh: bin/repl.o bin/prompt.o bin/unicorn.o bin/signals.o
 	cc -o unsh $^ -lreadline
 
 bin/%.o: src/%.c include/unicorn.h

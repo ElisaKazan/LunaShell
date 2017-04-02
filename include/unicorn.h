@@ -9,7 +9,8 @@
 
 typedef struct {
     char **arguments; // The arguments to be given to the command
-
+    int num_args;
+    
     char *output;
     char *input;
 } command;
@@ -20,9 +21,13 @@ typedef struct {
 
 // REPL functions
 
+int init_repl();
 int read_input(FILE *file, char **output);
 int parse_input(char *buffer, int len, command* command);
 int execute(command* command);
+void free_stack_command(command *command);
+
+extern pid_t current_foreground_child;
 
 // Prompt functions
 
@@ -30,7 +35,7 @@ int prompt_init();
 char* get_prompt();
 
 // Signal handling functions
-void register_signals();
+int register_signals();
 
 enum {
     UNSPECIFIED,
