@@ -23,7 +23,8 @@ static char* errors[] = {
     "duplicate inputs",
     "duplicate outputs",
     NULL,
-    "unmatched quote(s)"
+    "unmatched quote(s)",
+    "invalid escape character"
 };
 
 void error_ret(int ret, int quit_on_error) {

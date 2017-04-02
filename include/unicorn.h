@@ -1,6 +1,8 @@
 // Methods and definitions for the Unicorn Shell (unsh)
 
 #define _DEFAULT_SOURCE
+#define SHELL_NAME "unsh"
+#define UNICORN "🦄 "
 
 #include <stdio.h>
 #include <unistd.h>
@@ -9,7 +11,6 @@
 
 typedef struct {
     char **arguments; // The arguments to be given to the command
-
     char *output;
     char *input;
 } command;
@@ -37,5 +38,6 @@ enum {
     DUPLICATE_INPUT,
     DUPLICATE_OUTPUT,
     FILE_NOT_FOUND,
-    INVALID_QUOTES
+    INVALID_QUOTES,
+    INVALID_ESC
 } error;
