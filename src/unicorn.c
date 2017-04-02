@@ -37,7 +37,7 @@ void error_ret(int ret, int quit_on_error) {
             fprintf(stderr, "unsh: %s\n", errors[error]);
         }
 
-        if (error == ENCOUNTERED_EOF || quit_on_error) {
+        if (error == INVALID_ESC || error == ENCOUNTERED_EOF || quit_on_error) {
             printf("\n");
             exit(1);
         }

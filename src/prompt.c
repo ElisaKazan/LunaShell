@@ -91,7 +91,7 @@ char *get_prompt() {
                 default:
                     // Invalid escape character
                     error = INVALID_ESC;
-                    return 0;
+                    return NULL;
             }
 
             is_special = 0;
