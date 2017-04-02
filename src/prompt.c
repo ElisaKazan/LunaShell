@@ -40,9 +40,9 @@ int prompt_init() {
  * <description> TODO
  */
 char *get_prompt() {
-    int length = strlen("[\\u@\\h \\w]\\U $");
+    int length = strlen("[\\u@\\h \\w]\\U$ ");
     char user_data[length + 1];
-    strcpy(user_data, "[\\u@\\h \\w]\\U $");
+    strcpy(user_data, "[\\u@\\h \\w]\\U$ ");
 
     char working_buffer[PROMPT_MAX];
 
@@ -151,7 +151,8 @@ char *get_time(char *time_buf, int length) {
 }
 
 char *get_directory(char *dir_buf, int length) {
-    dir_buf = getcwd(NULL, 0);
+    getcwd(dir_buf, length);
+
     return dir_buf;
 }
 
