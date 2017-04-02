@@ -53,11 +53,21 @@ int main(int argc, char **argv) {
     int ret = prompt_init();
     error_ret(ret, 1);
 
+    ret = register_signals();
+    error_ret(ret, 1);
+
+    ret = init_repl();
+    error_ret(ret, 1);
+
     // Loop
     while(status == RUNNING) {
         // Read line (function will dynamically allocate line)
         ret = read_input(stdin, &line);
         error_ret(ret, 0);
+
+        if (!ret) {
+            continue;
+        }
 
         line_len = strlen(line) + 1;
 
@@ -68,14 +78,24 @@ int main(int argc, char **argv) {
         ret = parse_input(line, line_len, &command);
         error_ret(ret, 0);
 
+        if (!ret) {
+            continue;
+        }
+
         // Evaluate/Execute
-        //ret = execute(&command);
-        //error_ret(ret, 0);
+        ret = execute(&command);
+        error_ret(ret, 0);
+
+        if (!ret) {
+            continue;
+        }
 
         // Check status
 
         // Cleanup
         free(line);
+
+        free_stack_command(&command);
     }
     return 0;
 }

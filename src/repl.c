@@ -3,9 +3,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
+
+pid_t current_foreground_child = -1;
 
 /*
  * REPL.C
@@ -18,6 +21,12 @@
 
 char command_buffer[COMMAND_LENGTH];
 
+int init_repl() {
+    rl_catch_signals = 1;
+
+    return 1;
+}
+
 /* 
  * read_input 
  * returns 0 on error, 1 on success.
@@ -25,6 +34,7 @@ char command_buffer[COMMAND_LENGTH];
 int read_input(FILE *input, char **output) {
     int index = 0;
     if (input == stdin) {
+        // reset errno in case readline sets (we check if it's 0 below)
         char *line = readline(get_prompt());
 
         // We encountered an EOF
@@ -103,7 +113,10 @@ int parse_input(char *buffer, int length, command* command) {
         else if (buffer[i] == ' ' && quote == 0) {
             // Handling spaces outside of quotes
             buffer[i] = '\0';
-            numArgs += isArg; 
+            numArgs += isArg;
+        }
+        else if (buffer[i] == '\0') {
+            numArgs += isArg;
         }
         else if (buffer[i] == '<' || buffer[i] == '>') {
             // No more arguments
@@ -121,6 +134,7 @@ int parse_input(char *buffer, int length, command* command) {
 
     // Allocate space for args
     command->arguments = malloc(sizeof(char*) * (numArgs + 1));
+    command->num_args = numArgs;
 
     // Assign tokens to command variables
     i = 0;
@@ -172,18 +186,14 @@ int parse_input(char *buffer, int length, command* command) {
         currToken += len;
         i += len;
 
-        while (*currToken == '\0') {
+        while (i < length && *currToken == '\0') {
             currToken++;
             i++;
         }
     }
 
-    // TESTING
-    for (i = 0; i < numArgs; i++) {
-        printf("Argument %d: %s\n", i, command->arguments[i]);
-    }
-    printf("Output: %s\n", command->output);
-    printf("Input: %s\n", command->input);
+    command->arguments[numArgs] = NULL;
+
     return 1;
 }
 
@@ -221,9 +231,16 @@ int execute(command* command) {
 
             exit(1);
         }
+        ret = execvp(file, command->arguments);
 
-        execvp(file, command->arguments);
-        
+        if (ret == -1) {
+            perror("unsh");
+
+            fclose(output_file);
+            fclose(input_file);
+
+            exit(1);
+        }
         exit(0);
     }
     else if (pid == -1) {
@@ -233,18 +250,37 @@ int execute(command* command) {
         return 0;
     }
     else {
+        current_foreground_child = pid;
+        
         // We're the parent, and the child was created and lives at pid `pid`
         int status;
+        int ret;
         do {
-            waitpid(pid, &status, 0);
-        } while (WIFEXITED(status));
+            ret = waitpid(pid, &status, WNOHANG);
+        } while (!WIFEXITED(status) && ret != -1);
+        
+        // ECHILD is an expected error - since we don't handle SIGCHLD and we do this inline
+        // (to ensure that the processes don't clash) we just ignore it and move on, since we
+        // can still get the info we need
+        if (ret == -1 && errno != ECHILD) {
+            current_foreground_child = -1;
+            error = PERROR;
+            return 0;
+        }
 
         int exit_status = WEXITSTATUS(status);
 
-        printf("Process %d exited with status code %d\n", pid, exit_status);
+        //printf("Process %d exited with status code %d\n", pid, exit_status);
+
+        current_foreground_child = -1;
         
         return 1;
     }
     
     return 0;
+}
+
+
+void free_stack_command(command *command) {
+    free(command->arguments);
 }

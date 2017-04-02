@@ -109,7 +109,8 @@ char *get_prompt() {
 
     prompt_buffer[p] = '\0';
 
-    snprintf(prompt_buffer, PROMPT_MAX, "[%s@%s %s]🦄 $ ", username, hostname_buffer, getcwd(NULL, 0));
+    
+    //snprintf(prompt_buffer, PROMPT_MAX, "[%s@%s %s]🦄 $ ", username, hostname_buffer, getcwd(NULL, 0));
     return prompt_buffer;
 }
 
