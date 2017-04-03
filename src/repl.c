@@ -194,7 +194,6 @@ int parse_input(char *buffer, int length, command* command) {
             // Handling quotes
             quote = !quote;
             buffer[i] = '\0';
-            numArgs += isArg;
         }
         else if (buffer[i] == ' ' && quote == 0) {
             // Handling spaces outside of quotes
@@ -422,7 +421,13 @@ void free_stack_command(command *command) {
 }
 
 int cd_handler(command *com) {
+    int free_flag = 1;
+    
     char *dir = expandpath(com->arguments[1]);
+    if (!dir) {
+        dir = com->arguments[1];
+        free_flag = 0;
+    }
 
     printf("%s\n", dir);
 
@@ -442,7 +447,9 @@ int cd_handler(command *com) {
     int ret = chdir(dir);
 
     // expandpath dynamically allocates this
-    free(dir);
+    if (free_flag) {
+        free(dir);
+    }
 
     if (ret == -1) {
         error = PERROR;
