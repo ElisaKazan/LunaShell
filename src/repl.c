@@ -97,6 +97,8 @@ const int NUM_BUILTINS = sizeof builtins / sizeof builtins[0];
 
 char command_buffer[COMMAND_LENGTH];
 
+int interactive_repl = 0;
+
 int init_repl() {
     rl_catch_signals = 1;
 
@@ -110,6 +112,7 @@ int init_repl() {
 int read_input(FILE *input, char **output) {
     int index = 0;
     if (input == stdin) {
+        interactive_repl = 1;
         // reset errno in case readline sets (we check if it's 0 below)
         char *prompt = get_prompt();
 
@@ -132,6 +135,7 @@ int read_input(FILE *input, char **output) {
         *output = line;
     }
     else {
+        interactive_repl = 0;
         int c = fgetc(input);
 
         while(c != EOF && c != '\n' && c != ';') {
@@ -417,9 +421,23 @@ void free_stack_command(command *command) {
     free(command->arguments);
 }
 
-int cd_handler(command *command) {
-    char *dir = expandpath(command->arguments[1]);
+int cd_handler(command *com) {
+    char *dir = expandpath(com->arguments[1]);
+
     printf("%s\n", dir);
+
+    if (interactive_repl) {
+        // Execute an "ls" command to list the directory
+        const char* arguments[] = {"ls", "--color", dir, NULL};
+        command *ls = malloc(sizeof(command));
+        ls->arguments = (char**)arguments;
+        ls->input = com->input;
+        ls->output = com->output;
+
+        execute(ls);
+
+        free(ls);
+    }
 
     int ret = chdir(dir);
 
