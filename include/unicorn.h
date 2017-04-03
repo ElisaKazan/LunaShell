@@ -9,8 +9,6 @@
 #include <limits.h>
 #include <errno.h>
 
-#define UNICORN_ASCII "   \\\r\n   _\\,,          \r\n  \"-=\\~     \r\n     \\\\~___~~\r\n    _|/---\\\\_\r\n    \\        \\  "
-
 typedef struct {
     char **arguments; // The arguments to be given to the command
 
