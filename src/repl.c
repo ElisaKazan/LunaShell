@@ -489,8 +489,31 @@ int unset_handler(command *command) {
     return 1;
 }
 
+#define UNICORN_ASCII "   \\\r\n   _\\,,          \r\n  \"-=\\~     \r\n     \\\\~___~~\r\n    _|/---\\\\_\r\n    \\        \\  "
+
+const char *unicorn_quotes[] = {
+    "Push yourself because no one else is going to do it for you.",
+    "Tomorrow may be too late.",
+    "Take a chance.",
+    "Follow your heart.",
+    "Because the people who are crazy enough to think they can change the world are the ones who do.",
+    "In the end, we only regret the chances we didn't take.",
+    "Coffee? Coffee.",
+    "Don't regret anything you do, because in the end it makes you who you are.",
+    "There are seven days in the week and someday isn't one of them.",
+    "Go for a walk to clear your head.",
+    "The surest way to find your dream job is to create it.",
+    "*highfive*",
+    "Be happy! It drives people crazy.",
+    "Experiment. Fail. Learn. Repeat."
+};
+
 int unicorn_handler(command *command) {
-    fprintf(stderr, "Need to implement this :(\n");
+    printf("%s\n\n", UNICORN_ASCII);
+
+    srand(time(NULL));
+
+    printf("Unicorn says: %s\n", unicorn_quotes[rand()%sizeof(unicorn_quotes)/sizeof(unicorn_quotes[0])]);
 
     return 1;
 }
