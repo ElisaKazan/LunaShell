@@ -23,13 +23,13 @@ typedef struct {
 } builtin;
 
 typedef struct alias {
-    command *contents;
-    struct alias *prev;
+    char *name;
+    command *command_fragment;
     struct alias *next;
 } alias;
 
-alias *head = NULL;
-alias *tail = NULL;
+alias *alias_head = NULL;
+alias *alias_tail = NULL;
 
 int cd_handler(command *command);
 int exit_handler(command *command);
@@ -38,6 +38,8 @@ int setenv_handler(command *command);
 int unset_handler(command *command);
 int unicorn_handler(command *command);
 int rainbowize_handler(command *command);
+int alias_handler(command *command);
+int show_aliases_handler(command *command);
 
 builtin builtins[] = {
     {
@@ -81,6 +83,18 @@ builtin builtins[] = {
         .min_args = 1,
         .max_args = 1,
         .handler = rainbowize_handler
+    },
+    {
+        .name = "alias",
+        .min_args = 3,
+        .max_args = 3,
+        .handler = alias_handler
+    },
+    {
+        .name = "aliases",
+        .min_args = 1,
+        .max_args = 1,
+        .handler = show_aliases_handler
     }
 };
 
@@ -497,6 +511,66 @@ int unicorn_handler(command *command) {
 
 int rainbowize_handler(command *command) {
     rainbowize = !rainbowize;
+
+    return 1;
+}
+
+int alias_handler(command *info) {
+    //TODO: Run through the debugger and test why test->test works
+    int alias_name_strlen = strlen(info->arguments[1]);
+    int alias_value_strlen = strlen(info->arguments[2]);
+
+    // The name will persist after this repl loop, and
+    // therefore needs to be copied to save it from the
+    // automatic freeing of the current command.
+    // The value is simply used for parsing purposes,
+    // so it isn't needed after this loop.
+    char *alias_name = malloc(alias_name_strlen + 1);
+    strcpy(alias_name, info->arguments[1]);
+
+    char *alias_value = info->arguments[2];
+
+    // Allocate the relevant data structures
+    alias *new_alias = malloc(sizeof(alias));
+    command *command_fragment = malloc(sizeof(command));
+
+    if (new_alias == NULL || command_fragment == NULL) {
+        error = PERROR;
+        return 0;
+    }
+
+    // Fill up the new_alias
+    new_alias->name = alias_name;
+    // command hasn't yet been initialized with values
+    // but it's a pointer so we can fill it up
+    new_alias->command_fragment = command_fragment;
+
+    // Insert this alias at the back of the linked list
+    new_alias->next = NULL;
+
+    if (alias_head == NULL) {
+        alias_head = new_alias;
+    }
+
+    if (alias_tail != NULL) {
+        alias_tail->next = new_alias;
+    }
+    alias_tail = new_alias;
+
+    // Now we call the parser to fill up the actual
+    // command structure. Note that this destroys the
+    // string but that's okay since we never use it
+    // again.
+    return parse_input(alias_value, alias_value_strlen + 1, command_fragment);
+}
+
+int show_aliases_handler(command *_) {
+    alias *current = alias_head;
+
+    while (current) {
+        printf("%s->%s\n", current->name, current->command_fragment->arguments[0]);
+        current = current->next;
+    }
 
     return 1;
 }

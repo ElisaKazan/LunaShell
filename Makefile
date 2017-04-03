@@ -1,13 +1,13 @@
 DEPS := libreadline6 libreadline6-dev
 
 unsh: bin/repl.o bin/prompt.o bin/unicorn.o bin/signals.o
-	cc -o unsh $^ -lreadline
+	${CC} -o unsh $^ -lreadline
 
 bin/%.o: src/%.c include/unicorn.h
-	cc -Wall -std=c99 -c -Iinclude $(CFLAGS) $< -o $@
+	${CC} -Wall -std=c99 -c -Iinclude $(CFLAGS) $< -o $@
 
 deps:
 	sudo apt-get install ${DEPS}
 
 clean:
-	rm bin/*.o unsh
+	rm -rf bin/*.o unsh
