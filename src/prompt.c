@@ -63,6 +63,7 @@ char *get_prompt() {
 
     int i;      // user_data index
     int p = 0;  // prompt_buffer index
+    int old_rainbow;
 
     int is_special = 0; // Special boolean (0 = not special, 1 = special) 
 
@@ -88,7 +89,10 @@ char *get_prompt() {
                     break;
                 case 'U':
                     // Unicorn Emoji
+                    old_rainbow = rainbowize;
+                    rainbowize = 0;
                     p = insert_string(prompt_buffer, UNICORN, p);
+                    rainbowize = old_rainbow;
                     break;
                 case 't':
                     // Time
@@ -129,19 +133,9 @@ char *get_prompt() {
 }
 
 /*
- * adjust_prompt
- * Takes the buffer, string to put into buffer and index p in buffer
- * Returns the new p.
+ * insert_char
+ * 
  */
-
-int adjust_prompt(char *buffer, char *string, int p) {
-    int n = PROMPT_MAX - 1 - p;
-    strncpy(buffer + p, string, n);
-    p += min(n, strlen(string));
-
-    return p;
-}
-
 int insert_char(char *buffer, char character, int p) {
     if (rainbowize) {
         int len = 7;
